@@ -1,0 +1,5 @@
+alert('deleted!')
+//document.getElementById('posts').innerHTML = "<%=j(render 'posts', posts: @posts)%>"
+var target = '/posts/<%=@id%>'
+var parent = document.querySelector(`[href="${target}"]`).parentNode.parentNode
+parent.remove()

@@ -1,0 +1,61 @@
+<h2>게시판입니다.</h2>
+<p><%= link_to "글쓰기", new_post_path, class: "btn btn-primary" %></p>
+<img src="<%=@image_src%>">
+
+<hr />
+
+<!-- bootstrap 코드 링크
+https://getbootstrap.com/docs/4.0/content/tables/#examples -->
+<table class="table">
+  <colgroup>
+    <col span=3 style="width:10%"/>
+    <col style="width:40%"/>
+    <col style="width:10%"/>
+    <col span=3 style="width:*"/>
+  </colgroup>
+  <thead>
+    <tr>
+      <th id="user_id" scope="col">id</th>
+      <th scope="col">작성자</th>
+      <th scope="col">제목</th>
+      <th scope="col">내용</th>
+      <th scope="col">작성시간</th>
+      <th scope="col">보기</th>
+      <th scope="col">삭제</th>
+      <th scope="col">수정</th>
+    </tr>
+  </thead>
+  <tbody id="posts">
+    <%= render 'posts', posts: @posts %>
+  </tbody>
+</table>
+<%= paginate @posts %>
+<script>
+  function ajaxtest(id) {
+    $.ajax({
+      url: `/posts/${id}`,
+      dataType: 'script',
+      success: function(data) {
+        alert("success");
+      },
+      error: function(j, s) {
+        alert("error");
+        console.log("ej:"+j);
+          console.log("es:"+s);
+      },
+      complete: function(j, s) {
+        alert("complete");
+        console.log(j);
+        console.log("complete:" + s);
+      }
+    });
+  };
+
+  //window.onload = ajaxtest(11);
+  /*
+  $("td[data-back]").on('click', function() {
+    alert('hoho');
+    this.style.backgroundColor = this.getAttribute('data-back');
+  });
+  */
+</script>

@@ -1,0 +1,151 @@
+<div id="map" style="width:100%;height:600px;">
+</div>
+
+<script type="text/javascript" src="https://openapi.map.naver.com/openapi/v3/maps.js?clientId=LwR3ey2mwVqqzjczO_Og&callback=initMap"></script>
+  <script>
+var mapOptions = {
+    scaleControl: false, //스케일 보여주기
+    logoControl: false,  //네이버 로고 보여주기
+    mapTypeControl: false, //위성,일반 구분 기능
+    zoomControl: true,    //줌 컨트롤
+    zoomControlOptions: {
+      position: N.Position.RIGHT_BOTTOM
+    },
+    minZoom: 1,
+    maxZoom: 15 
+};
+
+  var map = new N.Map(document.getElementById('map'), mapOptions);
+  var jeju = new N.LatLng(33.3590628, 126.534361);
+  var jeju2 = new N.Point(126.534361, 33.3590628);
+  var naver = new N.LatLng(37.3595704, 127.105399);
+  var bounds;
+  function getData() {
+    bounds = map.getBounds();
+    max = bounds._max;
+    min = bounds._min;
+    $.ajax({
+      url: '/map_data' ,
+      data: {max: JSON.stringify(max), min: JSON.stringify(min)},
+      dataType: 'json',
+      type: "GET",
+      success: function(result) {
+        data = result;
+        //alert('success');
+        console.log(data);
+        createMarkersInfos();
+      }
+    });
+  }
+
+
+var data = [
+    {name: "아리차이", address: "서울특별시 관악구 신림동길 4", link: "https://store.naver.com/restaurants/detail?id=11704746", x: 126.9282765, y: 37.4876462},
+    {name: "한우등촌골", address: "서울특별시 강서구 등촌로 201", link: "https://store.naver.com/restaurants/detail?id=35966485", x:126.86273, y: 37.5476847},
+    {name: "수유부추곱창", address: "서울특별시 강북구 도봉로87길 26-21", link: "https://store.naver.com/restaurants/detail?id=37111836", x: 127.0247721, y: 37.6393168},
+    {name: "강천민물장어", address:"서울특별시 강동구 올림픽로 834 한강시티라이프", link: "https://store.naver.com/restaurants/detail?id=18905396", x: 127.1297937, y: 37.5553916 }
+  ];
+
+  map.setCenter(N.Point(data[0].x,data[0].y)); // 중심 좌표 이동
+  map.setZoom(15);     // 줌 레벨 변경
+
+  var pre_markers = [];
+  var markers = [];
+  var infoWindows = [];
+  //marker&infowindow 생성
+function createMarkersInfos() {
+  pre_markers = markers;
+  markers = [];
+  infoWindows = [];
+  //alert('create!');
+  for (var i=0; i<data.length; i++) {
+    restaurant = data[i]
+
+    var marker = new N.Marker({
+            map: map,
+            position: new N.Point(restaurant.x, restaurant.y),
+            animation: 2
+            /*icon: {
+              url: 'https://navermaps.github.io/maps.js/docs/img/example/sally.png',
+              size: new N.Size(50, 52),
+              origin: new N.Point(0, 0),
+              anchor: new N.Point(0, 0)
+            }*/
+        });
+
+    markers.push(marker);
+
+    var contentString = [
+      '<div class="iw_inner">',
+      '<h3>'+restaurant.name+'</h3>',
+      '<p>'+restaurant.address+'</p>',
+      '<a href='+restaurant.link+' target="_blank">알아보기</a>'
+    ].join('')
+
+    var infowindow = new N.InfoWindow({
+        content: contentString
+    });
+
+    infoWindows.push(infowindow);
+   };
+  addEvents();
+}
+
+function getClickHandler(seq) {
+    return function(e) {
+        var marker = markers[seq],
+            infoWindow = infoWindows[seq];
+
+        if (infoWindow.getMap()) { //정보가 맵에 표시되어 있는지
+            infoWindow.close();
+        } else {
+            infoWindow.open(map, marker);
+        }
+    }
+}
+
+
+function addEvents() {
+  //alert('addEvent!');
+for (var i=0, ii=markers.length; i<ii; i++) {
+    N.Event.addListener(markers[i], 'click', getClickHandler(i));
+}
+  updateMarkers(map,pre_markers);
+  updateMarkers(map,markers);
+}
+
+N.Event.addListener(map, 'idle', function() {
+  getData();
+});
+
+function updateMarkers(map, markers) {
+
+    var mapBounds = map.getBounds();
+    var marker, position;
+
+    for (var i = 0; i < markers.length; i++) {
+
+        marker = markers[i]
+        position = marker.getPosition();
+
+        if (mapBounds.hasLatLng(position)) {
+            showMarker(map, marker);
+        } else {
+            hideMarker(map, marker);
+        }
+    }
+  //alert('updated!')
+}
+
+function showMarker(map, marker) {
+
+    if (marker.getMap()) return;
+    marker.setMap(map);
+}
+
+function hideMarker(map, marker) {
+
+    if (!marker.getMap()) return;
+    marker.setMap(null);
+}
+  </script>

@@ -1,0 +1,15 @@
+<h1>로그인</h1>
+
+<%= form_tag(login_path) do %>
+<div class="form-group">
+<%= label_tag(:email, "이메일 : ") %>
+<%= email_field_tag(:email) %>
+</div>
+
+<div class="form-group">
+<%= label_tag(:password, "비밀번호 : ") %>
+<%= password_field_tag(:password) %>
+</div>
+
+<%= submit_tag("얍!!", class: 'btn btn-primary') %>
+<% end %>
